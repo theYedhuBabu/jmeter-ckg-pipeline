@@ -1,0 +1,616 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_CLICKHOUSE",
+      "label": "ClickHouse",
+      "description": "ClickHouse datasource",
+      "type": "datasource",
+      "pluginId": "grafana-clickhouse-datasource",
+      "pluginName": "ClickHouse"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-clickhouse-datasource",
+      "name": "ClickHouse",
+      "version": "4.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "gauge",
+      "name": "Gauge",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": []
+  },
+  "description": "JMeter Performance Dashboard backed by ClickHouse",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "📊 Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null }
+            ]
+          },
+          "unit": "short",
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 1,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "title": "Total Requests",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT count() AS value FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime)",
+          "refId": "A",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short",
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 2,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "title": "Failed Requests",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT countIf(success = 0) AS value FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime)",
+          "refId": "A",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "id": 3,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "displayMode": "gradient",
+        "minVizWidth": 75,
+        "minVizHeight": 75
+      },
+      "title": "Error Rate %",
+      "type": "gauge",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT round(countIf(success = 0) / count() * 100, 2) AS value FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime)",
+          "refId": "A",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "id": 4,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "title": "Total Throughput (RPS)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT toStartOfInterval(timestamp, INTERVAL $__interval_s second) AS time, count() / $__interval_s AS rps FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) GROUP BY time ORDER BY time",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "id": 5,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "title": "Total Errors",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT toStartOfInterval(timestamp, INTERVAL $__interval_s second) AS time, countIf(success = 0) AS errors FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) GROUP BY time ORDER BY time",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "id": 6,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "title": "Active Threads",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT toStartOfInterval(timestamp, INTERVAL $__interval_s second) AS time, max(all_threads) AS active_threads FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) GROUP BY time ORDER BY time",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "id": 7,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "title": "Transactions Response Times (95th pct)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT toStartOfInterval(timestamp, INTERVAL $__interval_s second) AS time, label, quantile(0.95)(elapsed) AS p95 FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) GROUP BY time, label ORDER BY time",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
+      "id": 200,
+      "title": "❌ Errors",
+      "type": "row",
+      "panels": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "fieldConfig": {
+            "defaults": { "unit": "short" },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+          "id": 201,
+          "options": {
+            "footer": { "show": false },
+            "showHeader": true,
+            "sortBy": [{ "displayName": "error_count", "desc": true }]
+          },
+          "title": "Errors per Transaction",
+          "type": "table",
+          "targets": [
+            {
+              "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+              "rawSql": "SELECT label AS transaction, countIf(success = 0) AS error_count FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) GROUP BY label ORDER BY error_count DESC",
+              "refId": "A",
+              "format": "table"
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "fieldConfig": {
+            "defaults": { "unit": "short" },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+          "id": 202,
+          "options": {
+            "footer": { "show": false },
+            "showHeader": true,
+            "sortBy": [{ "displayName": "error_count", "desc": true }]
+          },
+          "title": "Error Info",
+          "type": "table",
+          "targets": [
+            {
+              "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+              "rawSql": "SELECT response_code, response_message, failure_message, countIf(success = 0) AS error_count FROM jmeter_metrics WHERE test_name = '${test_name}' AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) AND success = 0 GROUP BY response_code, response_message, failure_message ORDER BY error_count DESC",
+              "refId": "A",
+              "format": "table"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+      "id": 300,
+      "title": "🔍 Individual Transaction – $transaction",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 23 },
+      "id": 301,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "title": "Total Requests – $transaction",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT count() AS value FROM jmeter_metrics WHERE test_name = '${test_name}' AND label = toString(${transaction}) AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime)",
+          "refId": "A",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 23 },
+      "id": 302,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "title": "Failed Requests – $transaction",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT countIf(success = 0) AS value FROM jmeter_metrics WHERE test_name = '${test_name}' AND label = toString(${transaction}) AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime)",
+          "refId": "A",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 23 },
+      "id": 303,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "displayMode": "gradient",
+        "minVizWidth": 75,
+        "minVizHeight": 75
+      },
+      "title": "Error Rate % – $transaction",
+      "type": "gauge",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT round(countIf(success = 0) / count() * 100, 2) AS value FROM jmeter_metrics WHERE test_name = '${test_name}' AND label = toString(${transaction}) AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime)",
+          "refId": "A",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
+      "id": 304,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "title": "Throughput – $transaction",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT toStartOfInterval(timestamp, INTERVAL $__interval_s second) AS time, count() / $__interval_s AS rps FROM jmeter_metrics WHERE test_name = '${test_name}' AND label = toString(${transaction}) AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) GROUP BY time ORDER BY time",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
+      "id": 305,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "title": "Errors – $transaction",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT toStartOfInterval(timestamp, INTERVAL $__interval_s second) AS time, countIf(success = 0) AS errors FROM jmeter_metrics WHERE test_name = '${test_name}' AND label = toString(${transaction}) AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) GROUP BY time ORDER BY time",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 35 },
+      "id": 306,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "title": "Response Times – $transaction",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "rawSql": "SELECT toStartOfInterval(timestamp, INTERVAL $__interval_s second) AS time, avg(elapsed) AS avg_ms, quantile(0.50)(elapsed) AS median_ms, quantile(0.90)(elapsed) AS p90_ms, quantile(0.95)(elapsed) AS p95_ms, quantile(0.99)(elapsed) AS p99_ms, max(elapsed) AS max_ms FROM jmeter_metrics WHERE test_name = '${test_name}' AND label = toString(${transaction}) AND timestamp >= toDateTime($__fromTime) AND timestamp <= toDateTime($__toTime) GROUP BY time ORDER BY time",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "tags": ["jmeter", "performance", "clickhouse"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "definition": "SELECT DISTINCT test_name FROM jmeter_metrics ORDER BY test_name",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Test Name",
+        "multi": false,
+        "name": "test_name",
+        "options": [],
+        "query": "SELECT DISTINCT test_name FROM jmeter_metrics ORDER BY test_name",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "definition": "SELECT DISTINCT label FROM jmeter_metrics WHERE test_name = '${test_name}' ORDER BY label",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Transaction",
+        "multi": false,
+        "name": "transaction",
+        "options": [],
+        "query": "SELECT DISTINCT label FROM jmeter_metrics WHERE test_name = '${test_name}' ORDER BY label",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "JMeter Performance Dashboard",
+  "uid": "jmeter-clickhouse-v1",
+  "version": 1
+}
