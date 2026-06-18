@@ -18,7 +18,7 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONNECTIONS_FROM_HOST://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,CONNECTIONS_FROM_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,CONNECTIONS_FROM_HOST://192.168.29.50:29092
 
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
@@ -47,6 +47,12 @@ services:
       - "3000:3000"
     environment:
       - GF_INSTALL_PLUGINS=grafana-clickhouse-datasource
+      - GF_SECURITY_ALLOW_EMBEDDING=true        # lets the hub iframe load Grafana (X-Frame-Options)
+      - GF_AUTH_ANONYMOUS_ENABLED=true          # panels render without an interactive login
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_SERVER_ROOT_URL=https://rug-spilt-patchwork.ngrok-free.dev/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:

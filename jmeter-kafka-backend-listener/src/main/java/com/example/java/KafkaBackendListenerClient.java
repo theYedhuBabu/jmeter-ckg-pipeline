@@ -76,6 +76,7 @@ public class KafkaBackendListenerClient extends AbstractBackendListenerClient{
                 metric.put("sent_bytes", result.getSentBytes());
                 metric.put("group_threads", result.getGroupThreads());
                 metric.put("all_threads", result.getAllThreads());
+
                 if (!result.isSuccessful()){
                     String body = result.getResponseDataAsString();
 
